@@ -29,6 +29,9 @@ jobs:  # Definisi pekerjaan atau langkah-langkah yang akan dijalankan
       - checkout
       - setup_remote_docker
       - run:
+          name: Login to Docker Hub
+          command: echo $PASSWORD_DOCKER_HUB | docker login --username rakean55 --password-stdin
+      - run:
           name: Build and Push Docker Image
           command: |
             docker build -t rakean55/karsajobs:latest .  # Build image Docker
