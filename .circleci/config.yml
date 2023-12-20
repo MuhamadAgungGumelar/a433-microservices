@@ -1,0 +1,45 @@
+version: 2.1  # Versi konfigurasi CircleCI yang digunakan
+
+jobs:  # Definisi pekerjaan atau langkah-langkah yang akan dijalankan
+  lint-dockerfile:  # Pekerjaan pertama: Linting Dockerfile
+    docker:  # Pengaturan Docker untuk pekerjaan ini
+      - image: circleci/golang:1.16  # Menggunakan image Docker dengan Go 1.16
+    steps:  # Langkah-langkah yang akan dijalankan dalam pekerjaan ini
+      - checkout  # Mengambil kode sumber dari repository
+      - run:  # Menjalankan perintah di dalam container
+          name: Lint Dockerfile  # Nama langkah untuk informasi log
+          command: |
+            go get -u github.com/hadolint/hadolint  # Menginstal hadolint
+            hadolint Dockerfile  # Menjalankan hadolint untuk Dockerfile
+
+  test-app:  # Pekerjaan kedua: Menjalankan unit test untuk aplikasi backend
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - run:
+          name: Run Unit Tests
+          command: go test -v -short --count=1 $(go list ./...)
+
+  build-app-karsajobs:  # Pekerjaan ketiga: Build dan push image Docker
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - run:
+          name: Build and Push Docker Image
+          command: |
+            docker build -t rakean55/karsajobs:latest .  # Build image Docker
+            docker push rakean55/karsajobs:latest  # Push image Docker ke registry
+
+workflows:  # Definisi alur kerja (workflows) yang mengatur bagaimana pekerjaan dijalankan
+  version: 2
+  build:  # Nama alur kerja: build
+    jobs:  # Pekerjaan yang akan dijalankan dalam alur kerja ini
+      - lint-dockerfile  # Jalankan pekerjaan lint-dockerfile terlebih dahulu
+      - test-app:  # Setelah lint-dockerfile selesai, jalankan test-app
+          requires:
+            - lint-dockerfile  # Memastikan lint-dockerfile selesai sebelumnya
+      - build-app-karsajobs:  # Setelah test-app selesai, jalankan build-app-karsajobs
+          requires:
+            - test-app  # Memastikan test-app selesai sebelumnya
