@@ -7,10 +7,11 @@ jobs:  # Definisi pekerjaan atau langkah-langkah yang akan dijalankan
     steps:  # Langkah-langkah yang akan dijalankan dalam pekerjaan ini
       - checkout  # Mengambil kode sumber dari repository
       - run:  # Menjalankan perintah di dalam container
-          name: Lint Dockerfile  # Nama langkah untuk informasi log
+          name: Install and Run Hadolint  # Nama langkah untuk informasi log
           command: |
-            go get -u github.com/hadolint/hadolint  # Menginstal hadolint
-            hadolint Dockerfile  # Menjalankan hadolint untuk Dockerfile
+            sudo wget -O /usr/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64
+            sudo chmod +x /usr/bin/hadolint
+            hadolint Dockerfile
 
   test-app:  # Pekerjaan kedua: Menjalankan unit test untuk aplikasi backend
     docker:
