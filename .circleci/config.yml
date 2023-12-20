@@ -1,0 +1,46 @@
+version: 2.1
+
+jobs:
+  # Job untuk melakukan linting terhadap Dockerfile
+  lint-dockerfile:
+    docker:
+      - image: circleci/node:14.21-alpine
+    steps:
+      - checkout  # Mengambil kode sumber proyek
+      - run:
+          name: Lint Dockerfile
+          command: |
+            # Menginstal alat linting (hadolint) dan menjalankannya terhadap Dockerfile
+            apk --update add --no-cache \
+              docker-cli \
+              curl \
+              && curl -sL -o /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v2.8.0/hadolint-Linux-x86_64" \
+              && chmod +x /usr/bin/hadolint \
+              && hadolint Dockerfile
+
+  # Job untuk membangun dan menerbitkan image Docker untuk karsajobs-ui
+  build-app-karsajobs-ui:
+    docker:
+      - image: circleci/node:14.21-alpine
+    steps:
+      - checkout  # Mengambil kode sumber proyek
+      - setup_remote_docker  # Mengatur Docker Remote untuk dapat digunakan dalam job
+      - run:
+          name: Login to Docker Hub
+          # Login ke Docker Hub menggunakan informasi otentikasi yang disimpan sebagai variabel rahasia di CircleCI
+          command: echo $PASSWORD_DOCKER_HUB | docker login --username rakean55 --password-stdin
+      - run:
+          name: Build and Push Docker Image
+          # Membangun image Docker dari kode sumber dan menerbitkannya ke Docker Hub
+          command: |
+            docker build -t rakean55/karsajobs-ui:latest .
+            docker push rakean55/karsajobs-ui:latest
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - lint-dockerfile
+      - build-app-karsajobs-ui:
+          requires:
+            - lint-dockerfile
