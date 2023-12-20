@@ -8,15 +8,11 @@ jobs:
     steps:
       - checkout  # Mengambil kode sumber proyek
       - run:
-          name: Lint Dockerfile
+          name: Install and Run Hadolint  # Nama langkah untuk informasi log
           command: |
-            # Menginstal alat linting (hadolint) dan menjalankannya terhadap Dockerfile
-            apk --update add --no-cache \
-              docker-cli \
-              curl \
-              && curl -sL -o /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v2.8.0/hadolint-Linux-x86_64" \
-              && chmod +x /usr/bin/hadolint \
-              && hadolint Dockerfile
+            sudo wget -O /usr/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64
+            sudo chmod +x /usr/bin/hadolint
+            hadolint Dockerfile
 
   # Job untuk membangun dan menerbitkan image Docker untuk karsajobs-ui
   build-app-karsajobs-ui:
