@@ -4,7 +4,7 @@ jobs:
   # Job untuk melakukan linting terhadap Dockerfile
   lint-dockerfile:
     docker:
-      - image: circleci/node:14.21-alpine
+      - image: circleci/node:14
     steps:
       - checkout  # Mengambil kode sumber proyek
       - run:
@@ -21,7 +21,7 @@ jobs:
   # Job untuk membangun dan menerbitkan image Docker untuk karsajobs-ui
   build-app-karsajobs-ui:
     docker:
-      - image: circleci/node:14.21-alpine
+      - image: circleci/node:14
     steps:
       - checkout  # Mengambil kode sumber proyek
       - setup_remote_docker  # Mengatur Docker Remote untuk dapat digunakan dalam job
