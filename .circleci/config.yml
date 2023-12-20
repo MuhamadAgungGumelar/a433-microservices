@@ -27,6 +27,7 @@ jobs:  # Definisi pekerjaan atau langkah-langkah yang akan dijalankan
       - image: circleci/golang:1.16
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Build and Push Docker Image
           command: |
